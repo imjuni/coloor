@@ -1,3 +1,4 @@
+import { uiPrimaryUX } from 'design/color';
 import { atomWithReset } from 'jotai/utils'
 
 interface IColorPropsAtom {
@@ -5,7 +6,7 @@ interface IColorPropsAtom {
 }
 
 const defaultValue: IColorPropsAtom = {
-  color: '#112233'
+  color: uiPrimaryUX.hex()
 }
 
 export const mainAtom = atomWithReset(defaultValue)

@@ -27,13 +27,22 @@ const StyledStackHeading = styled(Stack)`
   padding-left: 2em;
 
   h1 {
-    color: ${uiPrimaryUX.darken(0.4).toString()};
+    color: ${uiPrimaryUX.lighten(0.7).toString()};
   }
 `;
 
 const StyledStackBox = styled(Stack)`
   padding: 2em;
   justify-content: center;
+  z-index: 100;
+
+  @media screen and (min-width: 769px) {
+    flex-direction: row;
+  }
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const StyledStackShadeBox = styled(Stack)`
@@ -79,12 +88,26 @@ const StyledStackShadeBox = styled(Stack)`
 `;
 
 const StyledStackColorPickerBox = styled(Stack)`
-  margin-right: 2em;
+  @media screen and (min-width: 769px) {
+    margin-right: 2em;
+    margin-bottom: 0;
+  }
+
+  @media screen and (max-width: 768px) {
+    margin-right: 0;
+    margin-bottom: 2em;
+  }
+
+  .picker-widget {
+    width: 300px !important;
+  }
 `;
 
 const StyledStackColorResultBox = styled(Stack)`
+  align-items: center;
+
   .color-display-panel {
-    width: 400px;
+    width: 300px;
     height: 300px;
     box-shadow: rgb(0 0 0 / 15%) 0px 3px 12px;
     border-radius: 5px;
@@ -132,16 +155,17 @@ const Color: React.FC = () => {
       </StyledDivPageHeading>
 
       <StyledDivPageBody>
-        <StyledStackBox horizontal>
+        <StyledStackBox className="picker-box">
           <StyledStackColorPickerBox>
             <SketchPicker
+              className="picker-widget"
               color={state.color}
-              width="300px"
               onChange={(color) =>
                 dispatch({ type: "change-color", color: color.hex })
               }
             />
           </StyledStackColorPickerBox>
+
           <StyledStackColorResultBox>
             <Stack
               className="color-display-panel"
@@ -179,6 +203,12 @@ const Color: React.FC = () => {
                         className="shade"
                         style={{ backgroundColor: processed.toString() }}
                         horizontal
+                        onClick={() => {
+                          dispatch({
+                            type: "change-color",
+                            color: processed.hex(),
+                          });
+                        }}
                       >
                         <Stack className="shade-morder">
                           <Text

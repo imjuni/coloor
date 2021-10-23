@@ -3,7 +3,7 @@ import { initializeIcons } from "@fluentui/font-icons-mdl2";
 import { PartialTheme, ThemeProvider } from "@fluentui/react";
 import korean from "./i18n/korean.json";
 import { IntlProvider } from "react-intl";
-import { MemoryRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Color from "./pages/Color";
 
 const appTheme: PartialTheme = {
@@ -16,7 +16,7 @@ const App: React.FC = () => {
   return (
     <IntlProvider messages={korean} locale="ko" defaultLocale="ko">
       <ThemeProvider theme={appTheme}>
-        <Router>
+        <Router basename={process.env.PUBLIC_URL}>
           <Switch>
             <Route exact path="/" render={() => <Color />} />
           </Switch>
