@@ -116,6 +116,7 @@ dist
 /build
 /.astro
 /dist
+/coloor.zip
 
 # misc
 .DS_Store

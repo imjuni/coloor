@@ -6,11 +6,10 @@ interface Props {
 }
 
 const { title, description, active } = Astro.props;
-const base = `${import.meta.env.BASE_URL.replace(/\/$/u, "")}/`;
 const menus = [
-  { en: "Color picker", href: base, id: "picker", key: "nav.picker", ko: "색상 선택기" },
-  { en: "Contrast", href: `${base}contrast/`, id: "contrast", key: "nav.contrast", ko: "명암비" },
-  { en: "OKLCH", href: `${base}oklch/`, id: "oklch", key: "nav.oklch", ko: "OKLCH" },
+  { en: "Color picker", href: "/", id: "picker", key: "nav.picker", ko: "색상 선택기" },
+  { en: "Contrast", href: "/contrast/", id: "contrast", key: "nav.contrast", ko: "명암비" },
+  { en: "OKLCH", href: "/oklch/", id: "oklch", key: "nav.oklch", ko: "OKLCH" },
 ];
 ---
 
@@ -21,7 +20,7 @@ const menus = [
     <meta name="viewport" content="width=device-width" />
     <meta name="theme-color" content="#28a8ea" />
     <meta name="description" content={description} />
-    <link rel="icon" type="image/x-icon" href={`${base}favicon.ico`} />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <title>{title} | Coloor</title>
     <script is:inline>
       (() => {
@@ -43,7 +42,7 @@ const menus = [
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href={base}>Coloor</a>
+      <a class="brand" href="/">Coloor</a>
       <nav aria-label="주 메뉴">
         {menus.map((menu) => (
           <a href={menu.href} aria-current={active === menu.id ? "page" : undefined} data-i18n={menu.key} data-ko={menu.ko} data-en={menu.en}>
