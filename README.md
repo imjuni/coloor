@@ -1,46 +1,54 @@
-# Getting Started with Create React App
+# Coloor
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A color shade generator and native OKLCH/LCH explorer built with Astro and React.
 
-## Available Scripts
+## Requirements
 
-In the project directory, you can run:
+- Node.js 22.12 or newer
+- pnpm 10 or newer
 
-### `npm start`
+## Development
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```sh
+pnpm install
+pnpm dev
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Code quality
 
-### `npm test`
+The project uses Ultracite with Oxlint and Oxfmt.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```sh
+pnpm check
+pnpm fix
+```
 
-### `npm run build`
+`check` runs Astro's type checker followed by Ultracite's formatting and lint checks.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Build and deploy
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```sh
+pnpm build
+pnpm preview
+pnpm deploy
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The Astro site is configured for GitHub Pages at `https://imjuni.github.io/coloor/`.
 
-### `npm run eject`
+## OKLCH / LCH explorer
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+The OKLCH page uses native React components and the existing Color.js dependency.
+It includes CSS color parsing and conversion, alpha, sRGB/P3/Rec.2020 gamut
+visualization, an interactive 3D gamut model, undo/redo, persistent display settings,
+and shareable color URLs. No iframe, vendored picker application, or separate
+picker build is required.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- `src/components/oklch/`: inputs, preview, charts, 3D canvas, and styles
+- `src/hooks/use-picker.ts`: React state, history, settings, and URL synchronization
+- `src/utils/oklch.ts`: parsing, conversion, gamut mapping, and numeric expressions
+- `src/utils/gamut.ts`: chart coordinates and sampled gamut boundaries
+- `src/components/oklch/gamut.worker.ts`: background chart and mesh calculations
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Run `pnpm test:picker` for color conversion, gamut, URL, expression, and history
+tests. The 3D renderer is loaded on demand. Gamut surfaces are sampled and their
+on-screen colors depend on the display's capabilities; numeric output uses Color.js.
