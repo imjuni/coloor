@@ -6,6 +6,9 @@ export const THEME_KEY = "coloor:theme";
 export const PREFERENCE_EVENT = "coloor:preference-change";
 
 export const getLanguage = (): Language => {
+  if (typeof window === "undefined") {
+    return "ko";
+  }
   const saved = localStorage.getItem(LANGUAGE_KEY);
   if (saved === "ko" || saved === "en") {
     return saved;
