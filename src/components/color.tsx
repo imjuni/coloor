@@ -1,4 +1,4 @@
-import { SketchPicker } from "react-color";
+import * as ReactColor from "react-color";
 import { useIntl } from "react-intl";
 import styled from "@emotion/styled";
 import { StyledDivPageBody, StyledDivPageBox, StyledDivPageHeading } from "./layout";
@@ -9,6 +9,12 @@ import ColorValue from "colorjs.io";
 import { adjustLightness, toHex, toRgbChannels } from "../utils/color";
 import { bignumber } from "mathjs";
 const SHADE_LEVELS = Array.from({ length: 10 }, (_, index) => index);
+const reactColorModule = ReactColor as typeof ReactColor & { default?: typeof ReactColor };
+const SketchPicker = reactColorModule.SketchPicker ?? reactColorModule.default?.SketchPicker;
+
+if (!SketchPicker) {
+  throw new Error("SketchPicker is unavailable");
+}
 
 const StyledStackHeading = styled.div`
   display: flex;
