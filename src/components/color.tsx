@@ -1,4 +1,3 @@
-import { Text, Stack } from "@fluentui/react";
 import { SketchPicker } from "react-color";
 import { useIntl } from "react-intl";
 import styled from "@emotion/styled";
@@ -9,10 +8,10 @@ import { useReducerAtom } from "jotai/utils";
 import ColorValue from "colorjs.io";
 import { adjustLightness, toHex, toRgbChannels } from "../utils/color";
 import { bignumber } from "mathjs";
-import { populate } from "my-easy-fp";
-import { nanoid } from "nanoid";
+const SHADE_LEVELS = Array.from({ length: 10 }, (_, index) => index);
 
-const StyledStackHeading = styled(Stack)`
+const StyledStackHeading = styled.div`
+  display: flex;
   width: 100%;
   height: 100%;
   background-color: ${uiPrimaryUX.toString()};
@@ -21,10 +20,13 @@ const StyledStackHeading = styled(Stack)`
 
   h1 {
     color: ${adjustLightness(uiPrimaryUX, 0.7).toString()};
+    font-size: 28px;
+    font-weight: 400;
   }
 `;
 
-const StyledStackBox = styled(Stack)`
+const StyledStackBox = styled.div`
+  display: flex;
   padding: 2em;
   justify-content: center;
   z-index: 100;
@@ -38,7 +40,8 @@ const StyledStackBox = styled(Stack)`
   }
 `;
 
-const StyledStackShadeBox = styled(Stack)`
+const StyledStackShadeBox = styled.div`
+  display: flex;
   padding: 2em;
   justify-content: center;
   flex-wrap: wrap;
@@ -61,13 +64,17 @@ const StyledStackShadeBox = styled(Stack)`
     align-content: center;
 
     .shade {
+      display: flex;
+
       .shade-morder {
+        display: flex;
         width: 6em;
         padding-left: 1em;
         align-items: flex-start;
       }
 
       .shade-hex {
+        display: flex;
         flex: 1;
       }
 
@@ -81,7 +88,8 @@ const StyledStackShadeBox = styled(Stack)`
   }
 `;
 
-const StyledStackColorPickerBox = styled(Stack)`
+const StyledStackColorPickerBox = styled.div`
+  display: flex;
   @media screen and (min-width: 769px) {
     margin-right: 2em;
     margin-bottom: 0;
@@ -97,10 +105,13 @@ const StyledStackColorPickerBox = styled(Stack)`
   }
 `;
 
-const StyledStackColorResultBox = styled(Stack)`
+const StyledStackColorResultBox = styled.div`
+  display: flex;
   align-items: center;
 
   .color-display-panel {
+    display: flex;
+    justify-content: center;
     width: min(300px, calc(100vw - 4em));
     height: 300px;
     box-shadow: rgb(0 0 0 / 15%) 0px 3px 12px;
@@ -127,16 +138,15 @@ const calculateFontColor = (pickedColor: string) => {
 
 const Color: React.FC = () => {
   const intl = useIntl();
-  const shadeLevel = 10;
   const { state, dispatch } = useColorPropsBootstrap();
 
   return (
     <StyledDivPageBox>
       <StyledDivPageHeading>
         <StyledStackHeading>
-          <Text as="h1" variant="xxLarge">
+          <h1>
             {intl.formatMessage({ id: "color.heading" })}
-          </Text>
+          </h1>
         </StyledStackHeading>
       </StyledDivPageHeading>
 
@@ -151,25 +161,23 @@ const Color: React.FC = () => {
           </StyledStackColorPickerBox>
 
           <StyledStackColorResultBox>
-            <Stack className="color-display-panel" style={{ backgroundColor: `${state.color}` }}>
-              <Text
-                as="span"
-                variant="xxLarge"
+            <div className="color-display-panel" style={{ backgroundColor: `${state.color}` }}>
+              <span
                 style={{
                   color: calculateFontColor(state.color),
                   textAlign: "center",
                 }}
               >
                 {state.color}
-              </Text>
-            </Stack>
+              </span>
+            </div>
           </StyledStackColorResultBox>
         </StyledStackBox>
 
-        <StyledStackShadeBox horizontal>
-          {["lighten-shade", "darken-shade"].map((stackClassName, classNameIndex) => (
-            <Stack key={nanoid(classNameIndex)} className={stackClassName}>
-              {populate(shadeLevel).map((index) => {
+        <StyledStackShadeBox>
+          {["lighten-shade", "darken-shade"].map((stackClassName) => (
+            <div key={stackClassName} className={stackClassName}>
+              {SHADE_LEVELS.map((index) => {
                 const base = new ColorValue(state.color);
                 const morder = bignumber(index).mul(bignumber(0.05));
                 const processed =
@@ -177,11 +185,10 @@ const Color: React.FC = () => {
                     ? adjustLightness(base, morder.toNumber())
                     : adjustLightness(base, -morder.toNumber());
                 return (
-                  <Stack
-                    key={nanoid(index)}
+                  <div
+                    key={index}
                     className="shade"
                     style={{ backgroundColor: processed.toString() }}
-                    horizontal
                     onClick={() => {
                       dispatch({
                         color: toHex(processed),
@@ -189,34 +196,30 @@ const Color: React.FC = () => {
                       });
                     }}
                   >
-                    <Stack className="shade-morder">
-                      <Text
-                        as="span"
-                        variant="medium"
+                    <div className="shade-morder">
+                      <span
                         style={{
                           color: calculateFontColor(toHex(processed)),
                           textAlign: "center",
                         }}
                       >
                         {morder.mul(100).toString()}% - {morder.toString()}
-                      </Text>
-                    </Stack>
-                    <Stack className="shade-hex">
-                      <Text
-                        as="span"
-                        variant="medium"
+                      </span>
+                    </div>
+                    <div className="shade-hex">
+                      <span
                         style={{
                           color: calculateFontColor(toHex(processed)),
                           textAlign: "center",
                         }}
                       >
                         {toHex(processed)}
-                      </Text>
-                    </Stack>
-                  </Stack>
+                      </span>
+                    </div>
+                  </div>
                 );
               })}
-            </Stack>
+            </div>
           ))}
         </StyledStackShadeBox>
       </StyledDivPageBody>
