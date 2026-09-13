@@ -105,7 +105,7 @@ test("interprets Figma hex in Display P3 rather than sRGB", () => {
 test("restores shared URLs in both modes including normalized legacy LCH", () => {
   for (const value of [DEFAULT_COLOR, changeMode({ ...DEFAULT_COLOR, alpha: 0.3 }, "lch")]) {
     const restored = colorFromUrl(
-      new URL(`https://example.test/coloor/oklch/?space=${value.mode}${colorHash(value)}`),
+      new URL(`https://example.test/oklch/?space=${value.mode}${colorHash(value)}`),
     );
     assert.ok(restored);
     close(restored.l, value.l);

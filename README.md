@@ -30,10 +30,12 @@ pnpm fix
 ```sh
 pnpm build
 pnpm preview
-pnpm deploy
+pnpm artifact
 ```
 
-The Astro site is configured for GitHub Pages at `https://imjuni.github.io/coloor/`.
+The Astro site is configured for Cloudflare Pages at `https://coloor.pages.dev/`.
+Use `dist` as the Pages build output directory. `pnpm artifact` creates
+`coloor.zip` from a clean production build when a compressed upload is needed.
 
 ## OKLCH / LCH explorer
 
