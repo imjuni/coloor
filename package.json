@@ -12,7 +12,8 @@
     "check": "astro check && ultracite check",
     "fix": "ultracite fix",
     "deploy": "gh-pages -d dist",
-    "test:picker": "node --experimental-strip-types --test tests/oklch.test.mjs"
+    "test:picker": "node --experimental-strip-types --test tests/oklch.test.mjs",
+    "test:contrast": "node --experimental-strip-types --test tests/contrast.test.mjs"
   },
   "dependencies": {
     "@emotion/core": "^11.0.0",
