@@ -1,11 +1,15 @@
 ---
+import "../styles/globals.css";
+
 interface Props {
   title: string;
+  titleEn: string;
   description: string;
+  descriptionEn: string;
   active: "picker" | "contrast" | "oklch";
 }
 
-const { title, description, active } = Astro.props;
+const { title, titleEn, description, descriptionEn, active } = Astro.props;
 const menus = [
   { en: "Color picker", href: "/", id: "picker", key: "nav.picker", ko: "색상 선택기" },
   { en: "Contrast", href: "/contrast/", id: "contrast", key: "nav.contrast", ko: "명암비" },
@@ -19,9 +23,14 @@ const menus = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="theme-color" content="#28a8ea" />
-    <meta name="description" content={description} />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <title>{title} | Coloor</title>
+    <meta
+      name="description"
+      content={description}
+      data-ko={description}
+      data-en={descriptionEn}
+    />
+    <link rel="icon" type="image/x-icon" href="/coloor-icon-ico.ico" />
+    <title data-ko={`${title} | Coloor`} data-en={`${titleEn} | Coloor`}>{title} | Coloor</title>
     <script is:inline>
       (() => {
         const theme = localStorage.getItem("coloor:theme") || "system";
@@ -31,6 +40,7 @@ const menus = [
         }
         document.documentElement.dataset.theme = resolved;
         document.documentElement.dataset.themePreference = theme;
+        document.documentElement.classList.toggle("dark", resolved === "dark");
         const savedLanguage = localStorage.getItem("coloor:language");
         let language = navigator.language.toLowerCase().startsWith("ko") ? "ko" : "en";
         if (savedLanguage === "en" || savedLanguage === "ko") {
@@ -40,26 +50,39 @@ const menus = [
       })();
     </script>
   </head>
-  <body>
-    <header class="site-header">
-      <a class="brand" href="/">Coloor</a>
-      <nav aria-label="주 메뉴">
+  <body class="min-h-dvh bg-background text-foreground antialiased">
+    <header class="flex flex-wrap items-center gap-x-8 gap-y-3 border-b bg-background/95 px-6 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/75 max-[680px]:gap-x-3.5 max-[680px]:gap-y-2 max-[680px]:px-4 max-[680px]:py-2.5">
+      <a
+        class="inline-flex items-center gap-2.5 text-2xl font-bold tracking-tight text-primary no-underline"
+        href="/"
+        aria-label="Coloor 홈"
+      >
+        <img
+          class="size-9 rounded-lg object-contain"
+          src="/coloor-icon-transparent.png"
+          width="36"
+          height="36"
+          alt=""
+        />
+        <span>Coloor</span>
+      </a>
+      <nav class="flex flex-wrap gap-1.5 max-[680px]:order-3 max-[680px]:w-full" aria-label="주 메뉴">
         {menus.map((menu) => (
-          <a href={menu.href} aria-current={active === menu.id ? "page" : undefined} data-i18n={menu.key} data-ko={menu.ko} data-en={menu.en}>
+          <a class:list={["rounded-md px-3.5 py-2 text-sm font-medium text-muted-foreground no-underline transition-colors hover:bg-accent hover:text-accent-foreground max-[680px]:px-2.5", { "bg-secondary text-secondary-foreground": active === menu.id }]} href={menu.href} aria-current={active === menu.id ? "page" : undefined} data-i18n={menu.key} data-ko={menu.ko} data-en={menu.en}>
             {menu.ko}
           </a>
         ))}
       </nav>
-      <div class="site-preferences">
-        <label class="language-select">
+      <div class="ml-auto flex items-center gap-2">
+        <label class="flex min-h-9 items-center rounded-md border bg-background pl-2 text-sm">
           <span class="sr-only" data-i18n="label.language" data-ko="언어" data-en="Language">언어</span>
           <span aria-hidden="true">文A</span>
-          <select id="site-language" aria-label="언어">
+          <select class="border-0 bg-transparent px-1.5 py-2 text-foreground outline-none max-[680px]:max-w-24" id="site-language" aria-label="언어">
             <option value="ko">한국어</option>
             <option value="en">English</option>
           </select>
         </label>
-        <button id="site-theme" type="button" aria-label="테마" title="테마"><span aria-hidden="true" class="theme-icon"></span><span class="sr-only theme-label">테마</span></button>
+        <button class="inline-flex size-9 items-center justify-center rounded-md border bg-background text-foreground transition-colors hover:bg-accent" id="site-theme" type="button" aria-label="테마" title="테마"><span aria-hidden="true" class="theme-icon"></span><span class="sr-only theme-label">테마</span></button>
       </div>
     </header>
     <main><slot /></main>
@@ -87,6 +110,14 @@ const menus = [
     }
     for (const element of document.querySelectorAll<HTMLElement>("[data-i18n]")) {
       element.textContent = element.dataset[language] ?? element.textContent;
+    }
+    const title = document.querySelector<HTMLTitleElement>("title[data-ko][data-en]");
+    if (title) {
+      title.textContent = title.dataset[language] ?? title.textContent;
+    }
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (description) {
+      description.content = description.dataset[language] ?? description.content;
     }
   };
   const renderTheme = () => {
@@ -123,28 +154,7 @@ const menus = [
 </script>
 
 <style is:global>
-  *, *::before, *::after { box-sizing: border-box; }
-  :root { color-scheme: light; --site-bg: #fff; --site-text: #333; --site-border: #ddd; --site-hover: #f1f6fa; --site-active: #e4f3fc; --site-brand: #145b80; }
-  :root[data-theme="dark"] { color-scheme: dark; --site-bg: #101820; --site-text: #e8f0f5; --site-border: #2c3c48; --site-hover: #1c2b36; --site-active: #19384a; --site-brand: #72c6ec; }
-  body { margin: 0; color: var(--site-text); background: var(--site-bg); font-family: system-ui, sans-serif; }
-  .site-header { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 32px; padding: 12px 24px; border-bottom: 1px solid var(--site-border); background: var(--site-bg); }
-  .site-header .brand { color: var(--site-brand); font-size: 24px; font-weight: 700; text-decoration: none; }
-  .site-header nav { display: flex; flex-wrap: wrap; gap: 8px; }
-  .site-header nav a { display: block; padding: 10px 14px; border-radius: 6px; color: var(--site-text); text-decoration: none; line-height: 1.4; }
-  .site-header nav a:hover { background: var(--site-hover); }
-  .site-header nav a[aria-current="page"] { background: var(--site-active); color: var(--site-brand); font-weight: 700; }
-  .site-header a:focus-visible, .site-header button:focus-visible, .site-header select:focus-visible { outline: 3px solid var(--site-brand); outline-offset: 3px; }
-  .site-preferences { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-  .language-select, #site-theme { min-height: 38px; border: 1px solid var(--site-border); border-radius: 8px; background: var(--site-bg); color: var(--site-text); }
-  .language-select { display: flex; align-items: center; padding-left: 9px; }
-  .language-select select { border: 0; background: transparent; color: inherit; padding: 7px 8px 7px 5px; }
-  #site-theme { width: 40px; padding: 0; cursor: pointer; }
   .theme-icon::before { content: "◐"; font-size: 18px; }
   :root[data-theme-preference="light"] .theme-icon::before { content: "☀"; }
   :root[data-theme-preference="dark"] .theme-icon::before { content: "☾"; }
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-  .placeholder { max-width: 960px; margin: 0 auto; padding: 48px 24px; }
-  .placeholder h1 { margin: 0 0 16px; font-size: 28px; font-weight: 700; }
-  .placeholder p { margin: 0; line-height: 1.7; }
-  @media (max-width: 680px) { .site-header { gap: 8px 14px; padding: 10px 16px; } .site-header nav { order: 3; width: 100%; } .site-header nav a { padding: 8px 10px; font-size: 14px; } .language-select select { max-width: 92px; } }
 </style>

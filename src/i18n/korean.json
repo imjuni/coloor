@@ -1,4 +1,10 @@
 {
   "page.title": "색상 선택기",
-  "color.heading": "색상 선택 편집"
+  "color.heading": "색상 선택 편집",
+  "picker.history": "최근 색상",
+  "picker.clearHistory": "초기화",
+  "picker.selectColor": "{color} 선택",
+  "picker.copyHex": "HEX 복사",
+  "picker.copyRgba": "RGBA 복사",
+  "picker.apply": "적용"
 }

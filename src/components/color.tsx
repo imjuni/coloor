@@ -19,6 +19,9 @@ import ColorValue from "colorjs.io";
 import { adjustLightness, toHex, toRgbChannels } from "../utils/color";
 import { bignumber } from "mathjs";
 import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useIntl } from "react-intl";
 
 const COLOR_INPUT_DEBOUNCE_MS = 200;
 const COLOR_HISTORY_LIMIT = 30;
@@ -159,7 +162,7 @@ const HorizontalColorPicker = ({
             <span>HEX</span>
             <div>
               <span aria-hidden="true">#</span>
-              <input
+              <Input
                 aria-label="HEX color"
                 maxLength={6}
                 value={hexInput}
@@ -174,7 +177,7 @@ const HorizontalColorPicker = ({
           <label className="picker-value picker-rgba">
             <span>RGBA</span>
             <div>
-              <input
+              <Input
                 aria-label="RGBA color"
                 value={rgbaInput}
                 onChange={(event) => {
@@ -208,7 +211,7 @@ const StyledStackShadeBox = styled.div`
   min-height: 420px;
   margin: 0 auto;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--site-text), transparent 84%);
+  border: 1px solid color-mix(in srgb, var(--foreground), transparent 84%);
   border-radius: 18px;
   box-shadow: 0 12px 32px rgb(15 23 42 / 16%);
 
@@ -412,9 +415,9 @@ const StyledStackColorPickerBox = styled.div`
     box-sizing: border-box !important;
     width: 100% !important;
     padding: 14px !important;
-    border: 1px solid color-mix(in srgb, var(--site-text), transparent 82%);
+    border: 1px solid color-mix(in srgb, var(--foreground), transparent 82%);
     border-radius: 16px !important;
-    background: color-mix(in srgb, var(--site-bg), var(--site-text) 7%);
+    background: color-mix(in srgb, var(--background), var(--foreground) 7%);
     box-shadow: 0 12px 32px rgb(15 23 42 / 18%) !important;
   }
 
@@ -422,7 +425,7 @@ const StyledStackColorPickerBox = styled.div`
     position: relative;
     min-height: 148px;
     overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--site-text), transparent 80%);
+    border: 1px solid color-mix(in srgb, var(--foreground), transparent 80%);
     border-radius: 10px;
   }
 
@@ -434,9 +437,9 @@ const StyledStackColorPickerBox = styled.div`
     gap: 10px 12px;
     min-height: 148px;
     padding: 8px 10px;
-    border: 1px solid color-mix(in srgb, var(--site-text), transparent 86%);
+    border: 1px solid color-mix(in srgb, var(--foreground), transparent 86%);
     border-radius: 10px;
-    background: var(--site-bg);
+    background: var(--background);
   }
 
   .picker-swatch {
@@ -571,13 +574,13 @@ const StyledStackColorPickerBox = styled.div`
 const StyledColorHistory = styled.section`
   width: min(1180px, calc(100vw - 2rem));
   padding: 14px;
-  border: 1px solid color-mix(in srgb, var(--site-text), transparent 86%);
+  border: 1px solid color-mix(in srgb, var(--foreground), transparent 86%);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--site-bg), var(--site-text) 4%);
+  background: color-mix(in srgb, var(--background), var(--foreground) 4%);
 
   h2 {
     margin: 0 0 12px;
-    color: color-mix(in srgb, var(--site-text), transparent 35%);
+    color: color-mix(in srgb, var(--foreground), transparent 35%);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -603,7 +606,7 @@ const StyledColorHistory = styled.section`
     height: 42px;
     padding: 0;
     overflow: hidden;
-    border: 2px solid color-mix(in srgb, var(--site-bg), white 35%);
+    border: 2px solid color-mix(in srgb, var(--background), white 35%);
     border-radius: 50%;
     box-shadow: 0 2px 7px rgb(15 23 42 / 18%);
     cursor: pointer;
@@ -618,7 +621,7 @@ const StyledColorHistory = styled.section`
   }
 
   button:focus-visible {
-    outline: 3px solid var(--site-brand);
+    outline: 3px solid var(--primary);
     outline-offset: 3px;
   }
 
@@ -628,10 +631,10 @@ const StyledColorHistory = styled.section`
     min-width: 64px;
     height: 42px;
     padding: 0 12px;
-    border-color: color-mix(in srgb, var(--site-text), transparent 78%);
+    border-color: color-mix(in srgb, var(--foreground), transparent 78%);
     border-radius: 9px;
-    color: var(--site-text);
-    background: var(--site-bg);
+    color: var(--foreground);
+    background: var(--background);
     font-size: 12px;
     font-weight: 700;
   }
@@ -661,6 +664,7 @@ const calculateFontColor = (pickedColor: string) => {
 };
 
 const Color: React.FC = () => {
+  const intl = useIntl();
   const { state, dispatch } = useColorPropsBootstrap();
   const [alpha, setAlpha] = useState(1);
   const [hue, setHue] = useState(() => hexToHsva(state.color).h);
@@ -713,13 +717,15 @@ const Color: React.FC = () => {
             />
           </StyledStackColorPickerBox>
 
-          <StyledColorHistory aria-label="최근 색상">
-            <h2>History</h2>
+          <StyledColorHistory aria-label={intl.formatMessage({ id: "picker.history" })}>
+            <h2>{intl.formatMessage({ id: "picker.history" })}</h2>
             <div className="color-history-content">
               <div className="color-history-list">
                 {history.map((color) => (
-                  <button
-                    aria-label={`${color} 선택`}
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label={intl.formatMessage({ id: "picker.selectColor" }, { color })}
                     key={color}
                     type="button"
                     style={{ background: color }}
@@ -732,7 +738,8 @@ const Color: React.FC = () => {
                   />
                 ))}
               </div>
-              <button
+              <Button
+                variant="outline"
                 className="color-history-clear"
                 disabled={history.length === 0}
                 type="button"
@@ -741,8 +748,8 @@ const Color: React.FC = () => {
                   setHistory([]);
                 }}
               >
-                초기화
-              </button>
+                {intl.formatMessage({ id: "picker.clearHistory" })}
+              </Button>
             </div>
           </StyledColorHistory>
         </StyledStackBox>
@@ -770,31 +777,36 @@ const Color: React.FC = () => {
                     <div className="shade-value">
                       <span>HEX</span>
                       <code>{color.toUpperCase()}</code>
-                      <button
+                      <Button
+                        size="icon"
+                        variant="secondary"
                         aria-label={`${color} 복사`}
-                        title="HEX 복사"
+                        title={intl.formatMessage({ id: "picker.copyHex" })}
                         type="button"
                         className="shade-copy"
                         onClick={() => navigator.clipboard.writeText(color.toUpperCase())}
                       >
                         ⧉
-                      </button>
+                      </Button>
                     </div>
                     <div className="shade-value">
                       <span>RGBA</span>
                       <code>{rgba}</code>
-                      <button
+                      <Button
+                        size="icon"
+                        variant="secondary"
                         aria-label={`${rgba} 복사`}
-                        title="RGBA 복사"
+                        title={intl.formatMessage({ id: "picker.copyRgba" })}
                         type="button"
                         className="shade-copy"
                         onClick={() => navigator.clipboard.writeText(rgba)}
                       >
                         ⧉
-                      </button>
+                      </Button>
                     </div>
                   </div>
-                  <button
+                  <Button
+                    variant="secondary"
                     type="button"
                     className="shade-apply"
                     onClick={() => {
@@ -802,8 +814,8 @@ const Color: React.FC = () => {
                       saveColorToHistory(pickedColor);
                     }}
                   >
-                    적용
-                  </button>
+                    {intl.formatMessage({ id: "picker.apply" })}
+                  </Button>
                 </div>
               );
             })}
@@ -848,31 +860,36 @@ const Color: React.FC = () => {
                     <div className="shade-value">
                       <span>HEX</span>
                       <code>{color.toUpperCase()}</code>
-                      <button
+                      <Button
+                        size="icon"
+                        variant="secondary"
                         aria-label={`${color} 복사`}
-                        title="HEX 복사"
+                        title={intl.formatMessage({ id: "picker.copyHex" })}
                         type="button"
                         className="shade-copy"
                         onClick={() => navigator.clipboard.writeText(color.toUpperCase())}
                       >
                         ⧉
-                      </button>
+                      </Button>
                     </div>
                     <div className="shade-value">
                       <span>RGBA</span>
                       <code>{rgba}</code>
-                      <button
+                      <Button
+                        size="icon"
+                        variant="secondary"
                         aria-label={`${rgba} 복사`}
-                        title="RGBA 복사"
+                        title={intl.formatMessage({ id: "picker.copyRgba" })}
                         type="button"
                         className="shade-copy"
                         onClick={() => navigator.clipboard.writeText(rgba)}
                       >
                         ⧉
-                      </button>
+                      </Button>
                     </div>
                   </div>
-                  <button
+                  <Button
+                    variant="secondary"
                     type="button"
                     className="shade-apply"
                     onClick={() => {
@@ -880,8 +897,8 @@ const Color: React.FC = () => {
                       saveColorToHistory(pickedColor);
                     }}
                   >
-                    적용
-                  </button>
+                    {intl.formatMessage({ id: "picker.apply" })}
+                  </Button>
                 </div>
               );
             })}

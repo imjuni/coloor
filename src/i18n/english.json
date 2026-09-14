@@ -1,4 +1,10 @@
 {
   "page.title": "Color picker",
-  "color.heading": "Edit color selection"
+  "color.heading": "Edit color selection",
+  "picker.history": "Recent colors",
+  "picker.clearHistory": "Clear",
+  "picker.selectColor": "Select {color}",
+  "picker.copyHex": "Copy HEX",
+  "picker.copyRgba": "Copy RGBA",
+  "picker.apply": "Apply"
 }

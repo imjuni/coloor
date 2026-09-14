@@ -5,6 +5,7 @@ import { GamutChart } from "./gamut-chart";
 import { NumberField } from "./fields";
 import { translate } from "../../i18n/messages";
 import type { Language } from "../../utils/preferences";
+import { Card } from "@/components/ui/card";
 
 interface Props {
   channel: Channel;
@@ -46,7 +47,7 @@ export const ChannelCard = ({
   const displayValue = channel === "alpha" ? value.alpha * 100 : value[channel];
   const label = translate(language, channel);
   return (
-    <section className={`ok-card ok-channel ok-channel-${channel}`}>
+    <Card className={`ok-card ok-channel ok-channel-${channel}`}>
       <div className="ok-card-heading">
         <h2>
           {label} <span>{channel === "alpha" ? "α" : channel.toUpperCase()}</span>
@@ -100,6 +101,6 @@ export const ChannelCard = ({
         <span>0{channel === "alpha" ? "%" : ""}</span>
         <span>{channel === "alpha" ? "100%" : max}</span>
       </div>
-    </section>
+    </Card>
   );
 };

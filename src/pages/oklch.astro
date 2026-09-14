@@ -3,7 +3,13 @@ import Page from "../layouts/page.astro";
 import OklchPicker from "../components/oklch/picker";
 ---
 
-<Page title="OKLCH" description="OKLCH·LCH 색상 선택, 변환, 색역 그래프 및 3D 모델" active="oklch">
+<Page
+  title="OKLCH"
+  titleEn="OKLCH"
+  description="OKLCH·LCH 색상 선택, 변환, 색역 그래프 및 3D 모델"
+  descriptionEn="Pick and convert OKLCH or LCH colors with gamut graphs and a 3D model."
+  active="oklch"
+>
   <OklchPicker client:only="react" />
   <noscript>색상 선택기를 사용하려면 JavaScript를 활성화해 주세요.</noscript>
 </Page>

@@ -16,9 +16,16 @@ import { ChannelCard } from "./channel-card";
 import { CodeField } from "./fields";
 import "./picker.css";
 import { translate, useLanguage } from "../../i18n/messages";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { AppIntlProvider } from "../../i18n/provider";
 
 const GamutModel = lazy(() => import("./gamut-model"));
-const GAMUT_LABELS = { out: "표시 색역 밖", p3: "Display P3", rec2020: "Rec.2020", srgb: "sRGB" };
+const GAMUT_LABELS = {
+  en: { out: "Outside display gamut", p3: "Display P3", rec2020: "Rec.2020", srgb: "sRGB" },
+  ko: { out: "표시 색역 밖", p3: "Display P3", rec2020: "Rec.2020", srgb: "sRGB" },
+} as const;
 const ENGLISH_FORMATS = { ...FORMATS, auto: "Auto HEX / RGB", numbers: "Channel values" };
 
 const OklchPicker = () => {
@@ -77,23 +84,25 @@ const OklchPicker = () => {
           <p className="ok-muted">{t("intro")}</p>
         </div>
         <div className="ok-actions">
-          <button
+          <Button
+            variant="outline"
             type="button"
             disabled={!picker.canUndo}
             onClick={() => picker.undo()}
             title="Ctrl / ⌘ + Z"
           >
             ↶ {t("undo")}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
             type="button"
             disabled={!picker.canRedo}
             onClick={() => picker.redo()}
             title="Ctrl / ⌘ + Shift + Z"
           >
             ↷ {t("redo")}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             className="ok-primary"
             onClick={() => {
@@ -108,29 +117,32 @@ const OklchPicker = () => {
             }}
           >
             {t("copyLink")}
-          </button>
+          </Button>
         </div>
       </header>
       <div className="ok-workspace">
         <aside className="ok-sidebar" aria-label={t("sidebar")}>
-          <section className="ok-card ok-color-panel">
+          <Card className="ok-card ok-color-panel">
             <fieldset className="ok-mode" aria-label={t("colorSpace")}>
               {(["oklch", "lch"] as const).map((mode) => (
-                <button
+                <Button
+                  size="sm"
+                  variant={value.mode === mode ? "default" : "outline"}
                   key={mode}
                   type="button"
                   aria-pressed={value.mode === mode}
                   onClick={() => picker.commit(changeMode(value, mode))}
                 >
                   {mode.toUpperCase()}
-                </button>
+                </Button>
               ))}
             </fieldset>
             <div className="ok-samples checker">
               <div className="ok-sample" style={{ backgroundColor: nativeCode(value) }}>
                 <span>{t("selected")}</span>
               </div>
-              <button
+              <Button
+                variant="ghost"
                 type="button"
                 className="ok-sample"
                 style={{ backgroundColor: fallback.toString() }}
@@ -138,12 +150,12 @@ const OklchPicker = () => {
                 title={t("applyFallback")}
               >
                 <span>{t("fallback")} ↗</span>
-              </button>
+              </Button>
             </div>
             <div className="ok-gamut-status">
-              <span className={`ok-badge ${gamut === "out" ? "is-warning" : ""}`}>
-                {GAMUT_LABELS[gamut]}
-              </span>
+              <Badge variant={gamut === "out" ? "destructive" : "secondary"}>
+                {GAMUT_LABELS[language][gamut]}
+              </Badge>
               <span>
                 {Math.round(value.alpha * 100)}% {t("opacity")}
               </span>
@@ -200,8 +212,8 @@ const OklchPicker = () => {
             {gamut !== "srgb" && ["auto", "hex", "rgb", "hsl"].includes(settings.format) && (
               <p className="ok-muted">{t("gamutMapped")}</p>
             )}
-          </section>
-          <section className="ok-card ok-settings">
+          </Card>
+          <Card className="ok-card ok-settings">
             <h2>{t("settings")}</h2>
             <div className="ok-toggles">
               {(
@@ -243,7 +255,7 @@ const OklchPicker = () => {
               )}
             </div>
             <p className="ok-muted">{t("gamutNote")}</p>
-          </section>
+          </Card>
           <details className="ok-help">
             <summary>{t("keyboard")}</summary>
             <p className="ok-shortcuts">{t("shortcuts")}</p>
@@ -284,4 +296,10 @@ const OklchPicker = () => {
   );
 };
 
-export default OklchPicker;
+const OklchPickerWithIntl = () => (
+  <AppIntlProvider>
+    <OklchPicker />
+  </AppIntlProvider>
+);
+
+export default OklchPickerWithIntl;

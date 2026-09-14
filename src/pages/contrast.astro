@@ -3,7 +3,13 @@ import Page from "../layouts/page.astro";
 import ContrastChecker from "../components/contrast/checker";
 ---
 
-<Page title="명암비" description="명암비와 WCAG AA·AAA 확인 도구" active="contrast">
+<Page
+  title="명암비"
+  titleEn="Contrast"
+  description="명암비와 WCAG AA·AAA 확인 도구"
+  descriptionEn="Check color contrast against WCAG AA and AAA requirements."
+  active="contrast"
+>
   <ContrastChecker client:only="react" />
   <noscript>명암비 검사기를 사용하려면 JavaScript를 활성화해 주세요.</noscript>
 </Page>

@@ -20,6 +20,8 @@ import type { Mesh } from "../../utils/gamut";
 import { chromaMax, lightnessMax, toColor } from "../../utils/oklch";
 import type { PickerColor } from "../../utils/oklch";
 import type { Language } from "../../utils/preferences";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 interface Props {
   value: PickerColor;
@@ -141,12 +143,17 @@ const GamutModel = ({ value, p3, rec2020, language }: Props) => {
     return () => worker.terminate();
   }, [value.mode, p3, rec2020]);
   return (
-    <section className="ok-card ok-model">
+    <Card className="ok-card ok-model">
       <div className="ok-card-heading">
         <h2>3D {translate(language, "model")}</h2>
-        <button type="button" onClick={() => dialogRef.current?.showModal()}>
+        <Button
+          size="sm"
+          variant="outline"
+          type="button"
+          onClick={() => dialogRef.current?.showModal()}
+        >
           {translate(language, "enlarge")}
-        </button>
+        </Button>
       </div>
       {meshes.length === 0 ? (
         <output>
@@ -160,13 +167,18 @@ const GamutModel = ({ value, p3, rec2020, language }: Props) => {
           <h2 id="model-title">
             {value.mode.toUpperCase()} 3D {translate(language, "model")}
           </h2>
-          <button type="button" onClick={() => dialogRef.current?.close()}>
+          <Button
+            size="sm"
+            variant="outline"
+            type="button"
+            onClick={() => dialogRef.current?.close()}
+          >
             {translate(language, "close")}
-          </button>
+          </Button>
         </div>
         <ModelCanvas value={value} meshes={meshes} language={language} large />
       </dialog>
-    </section>
+    </Card>
   );
 };
 
