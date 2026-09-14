@@ -11,7 +11,7 @@
   --ok-shadow: #234b6510;
   color: var(--ok-ink);
   background: var(--ok-bg);
-  min-height: calc(100dvh - 68px);
+  min-height: 100%;
   padding: 36px clamp(16px, 3vw, 48px) 64px;
   font-family: system-ui, sans-serif;
 }

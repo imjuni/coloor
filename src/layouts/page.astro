@@ -50,8 +50,8 @@ const menus = [
       })();
     </script>
   </head>
-  <body class="min-h-dvh bg-background text-foreground antialiased">
-    <header class="flex flex-wrap items-stretch gap-x-8 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/75 max-[680px]:gap-x-3.5 max-[680px]:px-4">
+  <body class="flex h-dvh flex-col overflow-hidden bg-background text-foreground antialiased">
+    <header class="flex shrink-0 flex-wrap items-stretch gap-x-8 border-b bg-secondary px-6 max-[680px]:gap-x-3.5 max-[680px]:px-4">
       <a
         class="inline-flex items-center gap-2.5 py-3 text-2xl font-bold tracking-tight text-primary no-underline"
         href="/"
@@ -87,7 +87,24 @@ const menus = [
         <button class="inline-flex size-9 items-center justify-center rounded-md border bg-background text-foreground transition-colors hover:bg-accent" id="site-theme" type="button" aria-label="테마" title="테마"><span aria-hidden="true" class="theme-icon"></span><span class="sr-only theme-label">테마</span></button>
       </div>
     </header>
-    <main><slot /></main>
+    <main class="min-h-0 flex-1 overflow-y-auto"><slot /></main>
+    <footer class="flex h-6 shrink-0 items-center justify-between border-t bg-secondary px-4 text-xs text-muted-foreground">
+      <div class="flex gap-2">
+        <span>Theme: </span>
+        <span class="font-bold" id="footer-theme">system</span>
+      </div>
+      <div class="flex gap-4">
+        <span>© 2025 Coloor</span>
+        <a
+          class="font-bold transition-colors hover:text-foreground"
+          href="https://rovinjsoft.com/"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Rovinj Soft Co.
+        </a>
+      </div>
+    </footer>
   </body>
 </html>
 
@@ -98,6 +115,7 @@ const menus = [
   const languageMenu = document.querySelector<HTMLElement>("#language-menu");
   const languageOptions = document.querySelector<HTMLElement>("#language-options");
   const themeButton = document.querySelector<HTMLButtonElement>("#site-theme");
+  const footerTheme = document.querySelector<HTMLElement>("#footer-theme");
   const media = matchMedia("(prefers-color-scheme: dark)");
   const labels = {
     en: { dark: "Dark theme", language: "Language", light: "Light theme", system: "System theme" },
@@ -133,6 +151,9 @@ const menus = [
     const language = getLanguage();
     const theme = getTheme();
     applyTheme(theme);
+    if (footerTheme) {
+      footerTheme.textContent = theme;
+    }
     if (themeButton) {
       const label = labels[language][theme];
       themeButton.ariaLabel = label;

@@ -177,7 +177,7 @@ const ContrastCheckerContent = () => {
   };
 
   return (
-    <div className="min-h-[calc(100dvh-68px)] bg-muted/35 px-4 py-9 sm:px-8 lg:px-12">
+    <div className="min-h-full bg-background px-4 py-9 sm:px-8 lg:px-12">
       <header className="mx-auto mb-7 flex max-w-7xl flex-wrap items-center justify-between gap-5">
         <div>
           <p className="text-[10px] font-bold tracking-[0.2em] text-primary">ACCESSIBILITY TOOL</p>
