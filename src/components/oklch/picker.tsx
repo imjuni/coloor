@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { usePicker } from "../../hooks/use-picker";
 import {
   changeMode,
-  colorHash,
+  colorQuery,
   fallbackColor,
   FORMATS,
   formatColor,
@@ -107,7 +107,8 @@ const OklchPicker = () => {
             className="ok-primary"
             onClick={() => {
               const url = new URL(location.href);
-              url.hash = colorHash(value);
+              url.hash = "";
+              url.searchParams.set("color", colorQuery(value));
               if (value.mode === "lch") {
                 url.searchParams.set("space", "lch");
               } else {
@@ -289,7 +290,7 @@ const OklchPicker = () => {
           )}
         </div>
       </div>
-      <output className="ok-notice" aria-live="polite">
+      <output className="app-notice" aria-live="polite">
         {notice}
       </output>
     </div>

@@ -5,6 +5,7 @@ import {
   changeMode,
   colorFromUrl,
   colorHash,
+  colorQuery,
   DEFAULT_COLOR,
   fallbackColor,
   formatColor,
@@ -112,6 +113,10 @@ test("restores shared URLs in both modes including normalized legacy LCH", () =>
     close(restored.c, value.c);
     close(restored.alpha, value.alpha);
     assert.equal(restored.mode, value.mode);
+    const queryUrl = new URL("https://example.test/oklch/");
+    queryUrl.searchParams.set("space", value.mode);
+    queryUrl.searchParams.set("color", colorQuery(value));
+    assert.deepEqual(colorFromUrl(queryUrl), restored);
   }
   assert.equal(colorFromUrl(new URL("https://example.test/?space=lch#0.5,40,200,100")).l, 50);
 });

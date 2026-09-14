@@ -22,6 +22,7 @@ import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useIntl } from "react-intl";
+import { Copy, Link } from "lucide-react";
 
 const COLOR_INPUT_DEBOUNCE_MS = 200;
 const COLOR_HISTORY_LIMIT = 30;
@@ -38,6 +39,7 @@ interface HorizontalColorPickerProps {
   hsva: HsvaColor;
   onChange: (color: HsvaColor) => void;
   onCommit: (color: HsvaColor) => void;
+  onCopy: (value: string) => void;
 }
 
 const SliderPointer = ({ left = "0%" }: PointerProps) => (
@@ -53,7 +55,9 @@ const HorizontalColorPicker = ({
   hsva,
   onChange,
   onCommit,
+  onCopy,
 }: HorizontalColorPickerProps) => {
+  const intl = useIntl();
   const [hexInput, setHexInput] = useState(() => hsvaToHex(hsva).slice(1).toUpperCase());
   const [rgbaInput, setRgbaInput] = useState(() => hsvaToRgbaString(hsva));
   const inputChanges = useMemo(() => new Subject<ColorInputChange>(), []);
@@ -172,6 +176,16 @@ const HorizontalColorPicker = ({
                   inputChanges.next({ format: "hex", value });
                 }}
               />
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                type="button"
+                aria-label={intl.formatMessage({ id: "picker.copyHex" })}
+                title={intl.formatMessage({ id: "picker.copyHex" })}
+                onClick={() => onCopy(`#${hexInput}`)}
+              >
+                <Copy aria-hidden="true" />
+              </Button>
             </div>
           </label>
           <label className="picker-value picker-rgba">
@@ -186,6 +200,16 @@ const HorizontalColorPicker = ({
                   inputChanges.next({ format: "rgba", value });
                 }}
               />
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                type="button"
+                aria-label={intl.formatMessage({ id: "picker.copyRgba" })}
+                title={intl.formatMessage({ id: "picker.copyRgba" })}
+                onClick={() => onCopy(rgbaInput)}
+              >
+                <Copy aria-hidden="true" />
+              </Button>
             </div>
           </label>
         </div>
@@ -504,12 +528,13 @@ const StyledStackColorPickerBox = styled.div`
   .picker-value > div {
     display: flex;
     align-items: center;
-    height: 44px;
-    padding: 0 12px;
-    border: 1px solid #d8dee6;
-    border-radius: 9px;
-    color: #334155;
-    background: #f8fafc;
+    height: 48px;
+    padding: 0 8px;
+    border: 1px solid var(--input);
+    border-radius: 6px;
+    color: var(--foreground);
+    background: var(--background);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
     font:
       700 18px ui-monospace,
       SFMono-Regular,
@@ -517,6 +542,11 @@ const StyledStackColorPickerBox = styled.div`
       Monaco,
       Consolas,
       monospace;
+  }
+
+  .picker-value > div:focus-within {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ring), transparent 55%);
   }
 
   .picker-value input {
@@ -669,6 +699,7 @@ const Color: React.FC = () => {
   const [alpha, setAlpha] = useState(1);
   const [hue, setHue] = useState(() => hexToHsva(state.color).h);
   const [history, setHistory] = useState<string[]>([]);
+  const [notice, setNotice] = useState("");
   const hsva = { ...hexToHsva(state.color), a: alpha, h: hue };
 
   useEffect(() => {
@@ -685,6 +716,23 @@ const Color: React.FC = () => {
       localStorage.removeItem(COLOR_HISTORY_STORAGE_KEY);
     }
   }, []);
+
+  useEffect(() => {
+    if (!notice) {
+      return;
+    }
+    const timer = window.setTimeout(() => setNotice(""), 3000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
+  const copyColor = async (value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setNotice(intl.formatMessage({ id: "picker.copied" }));
+    } catch {
+      setNotice(intl.formatMessage({ id: "picker.copyFailed" }));
+    }
+  };
 
   const changePickerColor = (pickedColor: HsvaColor) => {
     setAlpha(pickedColor.a);
@@ -704,16 +752,50 @@ const Color: React.FC = () => {
     });
   };
 
+  useEffect(() => {
+    const url = new URL(location.href);
+    const color = url.searchParams.get("color");
+    if (!color || !/^[\dA-Fa-f]{6}$/u.test(color)) {
+      return;
+    }
+    const next = hexToHsva(`#${color}`);
+    const alphaParam = url.searchParams.get("alpha");
+    const hueParam = url.searchParams.get("hue");
+    const sharedAlpha = alphaParam === null ? Number.NaN : Number(alphaParam);
+    const sharedHue = hueParam === null ? Number.NaN : Number(hueParam);
+    changePickerColor({
+      ...next,
+      a: Number.isFinite(sharedAlpha) ? Math.min(1, Math.max(0, sharedAlpha / 100)) : 1,
+      h: Number.isFinite(sharedHue) ? Math.min(360, Math.max(0, sharedHue)) : next.h,
+    });
+  }, []);
+
+  const copyShareLink = () => {
+    const url = new URL(location.href);
+    url.hash = "";
+    url.searchParams.set("color", hsvaToHex(hsva).slice(1).toUpperCase());
+    url.searchParams.set("alpha", String(Math.round(hsva.a * 100)));
+    url.searchParams.set("hue", String(Math.round(hsva.h * 100) / 100));
+    void copyColor(url.href);
+  };
+
   return (
     <StyledDivPageBox>
       <StyledDivPageBody>
         <StyledStackBox className="picker-box">
+          <div className="flex w-[min(1180px,calc(100vw-2rem))] justify-end">
+            <Button type="button" variant="outline" onClick={copyShareLink}>
+              <Link aria-hidden="true" />
+              {intl.formatMessage({ id: "picker.copyLink" })}
+            </Button>
+          </div>
           <StyledStackColorPickerBox>
             <HorizontalColorPicker
               className="picker-widget"
               hsva={hsva}
               onChange={changePickerColor}
               onCommit={saveColorToHistory}
+              onCopy={(value) => void copyColor(value)}
             />
           </StyledStackColorPickerBox>
 
@@ -784,7 +866,7 @@ const Color: React.FC = () => {
                         title={intl.formatMessage({ id: "picker.copyHex" })}
                         type="button"
                         className="shade-copy"
-                        onClick={() => navigator.clipboard.writeText(color.toUpperCase())}
+                        onClick={() => void copyColor(color.toUpperCase())}
                       >
                         ⧉
                       </Button>
@@ -799,7 +881,7 @@ const Color: React.FC = () => {
                         title={intl.formatMessage({ id: "picker.copyRgba" })}
                         type="button"
                         className="shade-copy"
-                        onClick={() => navigator.clipboard.writeText(rgba)}
+                        onClick={() => void copyColor(rgba)}
                       >
                         ⧉
                       </Button>
@@ -867,7 +949,7 @@ const Color: React.FC = () => {
                         title={intl.formatMessage({ id: "picker.copyHex" })}
                         type="button"
                         className="shade-copy"
-                        onClick={() => navigator.clipboard.writeText(color.toUpperCase())}
+                        onClick={() => void copyColor(color.toUpperCase())}
                       >
                         ⧉
                       </Button>
@@ -882,7 +964,7 @@ const Color: React.FC = () => {
                         title={intl.formatMessage({ id: "picker.copyRgba" })}
                         type="button"
                         className="shade-copy"
-                        onClick={() => navigator.clipboard.writeText(rgba)}
+                        onClick={() => void copyColor(rgba)}
                       >
                         ⧉
                       </Button>
@@ -904,6 +986,9 @@ const Color: React.FC = () => {
             })}
           </div>
         </StyledStackShadeBox>
+        <output className="app-notice" aria-live="polite">
+          {notice}
+        </output>
       </StyledDivPageBody>
     </StyledDivPageBox>
   );

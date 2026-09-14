@@ -6,5 +6,8 @@
   "picker.selectColor": "{color} 선택",
   "picker.copyHex": "HEX 복사",
   "picker.copyRgba": "RGBA 복사",
-  "picker.apply": "적용"
+  "picker.copied": "클립보드에 복사했습니다.",
+  "picker.copyFailed": "복사하지 못했습니다. 클립보드 권한을 확인해 주세요.",
+  "picker.apply": "적용",
+  "picker.copyLink": "링크 복사"
 }

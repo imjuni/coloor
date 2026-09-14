@@ -130,3 +130,18 @@
     @apply font-sans;
   }
 }
+
+.app-notice:not(:empty) {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  z-index: 20;
+  max-width: calc(100vw - 32px);
+  padding: 12px 20px;
+  border-radius: 10px;
+  color: white;
+  background: #20394a;
+  box-shadow: 0 4px 20px #0002;
+  font-size: 13px;
+  transform: translateX(-50%);
+}

@@ -135,12 +135,16 @@ export const formatColor = (value: PickerColor, format: OutputFormat): string =>
   return source.to(format).toString({ inGamut: false, precision: 6 });
 };
 
-// Use the original shared URL shape, including normalized LCH lightness and percent alpha.
+// Keep the legacy hash serializer while shared links migrate to query parameters.
 export const colorHash = (value: PickerColor): string =>
   `#${[value.l / lightnessMax(value.mode), value.c, value.h, value.alpha * 100].map((v) => round(v, 8)).join(",")}`;
+export const colorQuery = (value: PickerColor): string =>
+  [value.l / lightnessMax(value.mode), value.c, value.h, value.alpha * 100]
+    .map((channel) => round(channel, 8))
+    .join(",");
 export const colorFromUrl = (url: URL): PickerColor | null => {
   const mode = url.searchParams.get("space") === "lch" ? "lch" : "oklch";
-  const raw = url.hash.slice(1).split(",");
+  const raw = (url.searchParams.get("color") ?? url.hash.slice(1)).split(",");
   if (raw.length !== 4 || raw.some((v) => !v.trim() || !Number.isFinite(Number(v)))) {
     return null;
   }

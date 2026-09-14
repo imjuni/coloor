@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { colorFromUrl, colorHash, DEFAULT_COLOR, FORMATS, historyReducer } from "../utils/oklch";
+import { colorFromUrl, colorQuery, DEFAULT_COLOR, FORMATS, historyReducer } from "../utils/oklch";
 import type { OutputFormat, PickerColor } from "../utils/oklch";
 
 export interface PickerSettings {
@@ -86,7 +86,8 @@ export const usePicker = () => {
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const url = new URL(location.href);
-      url.hash = colorHash(value);
+      url.hash = "";
+      url.searchParams.set("color", colorQuery(value));
       if (value.mode === "lch") {
         url.searchParams.set("space", "lch");
       } else {

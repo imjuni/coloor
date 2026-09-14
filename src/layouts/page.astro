@@ -51,9 +51,9 @@ const menus = [
     </script>
   </head>
   <body class="min-h-dvh bg-background text-foreground antialiased">
-    <header class="flex flex-wrap items-center gap-x-8 gap-y-3 border-b bg-background/95 px-6 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/75 max-[680px]:gap-x-3.5 max-[680px]:gap-y-2 max-[680px]:px-4 max-[680px]:py-2.5">
+    <header class="flex flex-wrap items-stretch gap-x-8 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/75 max-[680px]:gap-x-3.5 max-[680px]:px-4">
       <a
-        class="inline-flex items-center gap-2.5 text-2xl font-bold tracking-tight text-primary no-underline"
+        class="inline-flex items-center gap-2.5 py-3 text-2xl font-bold tracking-tight text-primary no-underline"
         href="/"
         aria-label="Coloor 홈"
       >
@@ -66,22 +66,24 @@ const menus = [
         />
         <span>Coloor</span>
       </a>
-      <nav class="flex flex-wrap gap-1.5 max-[680px]:order-3 max-[680px]:w-full" aria-label="주 메뉴">
+      <nav class="flex flex-wrap items-stretch gap-8 max-[680px]:order-3 max-[680px]:w-full max-[680px]:gap-5" aria-label="주 메뉴">
         {menus.map((menu) => (
-          <a class:list={["rounded-md px-3.5 py-2 text-sm font-medium text-muted-foreground no-underline transition-colors hover:bg-accent hover:text-accent-foreground max-[680px]:px-2.5", { "bg-secondary text-secondary-foreground": active === menu.id }]} href={menu.href} aria-current={active === menu.id ? "page" : undefined} data-i18n={menu.key} data-ko={menu.ko} data-en={menu.en}>
+          <a class:list={["relative inline-flex items-center px-0.5 pt-0.5 text-base font-semibold text-muted-foreground no-underline transition-colors hover:text-foreground max-[680px]:py-3 max-[680px]:text-sm", { "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:rounded-full after:bg-foreground": active === menu.id }]} href={menu.href} aria-current={active === menu.id ? "page" : undefined} data-i18n={menu.key} data-ko={menu.ko} data-en={menu.en}>
             {menu.ko}
           </a>
         ))}
       </nav>
-      <div class="ml-auto flex items-center gap-2">
-        <label class="flex min-h-9 items-center rounded-md border bg-background pl-2 text-sm">
-          <span class="sr-only" data-i18n="label.language" data-ko="언어" data-en="Language">언어</span>
-          <span aria-hidden="true">文A</span>
-          <select class="border-0 bg-transparent px-1.5 py-2 text-foreground outline-none max-[680px]:max-w-24" id="site-language" aria-label="언어">
-            <option value="ko">한국어</option>
-            <option value="en">English</option>
-          </select>
-        </label>
+      <div class="ml-auto flex items-center gap-2 py-3">
+        <div class="relative" id="language-menu">
+          <button class="inline-flex size-9 items-center justify-center rounded-md border bg-background text-foreground transition-colors hover:bg-accent" id="site-language" type="button" aria-label="언어" aria-haspopup="menu" aria-expanded="false">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+            <span class="sr-only" data-i18n="label.language" data-ko="언어" data-en="Language">언어</span>
+          </button>
+          <div class="absolute right-0 top-11 z-50 hidden min-w-36 rounded-lg border bg-popover p-1 text-popover-foreground shadow-lg" id="language-options" role="menu">
+            <button class="flex w-full rounded-md px-3 py-2 text-left text-sm hover:bg-accent" type="button" role="menuitem" data-locale="ko">한국어</button>
+            <button class="flex w-full rounded-md px-3 py-2 text-left text-sm hover:bg-accent" type="button" role="menuitem" data-locale="en">English</button>
+          </div>
+        </div>
         <button class="inline-flex size-9 items-center justify-center rounded-md border bg-background text-foreground transition-colors hover:bg-accent" id="site-theme" type="button" aria-label="테마" title="테마"><span aria-hidden="true" class="theme-icon"></span><span class="sr-only theme-label">테마</span></button>
       </div>
     </header>
@@ -92,10 +94,11 @@ const menus = [
 <script>
   import { applyTheme, getLanguage, getTheme, setLanguage } from "../utils/preferences";
 
-  const languageSelect = document.querySelector<HTMLSelectElement>("#site-language");
+  const languageButton = document.querySelector<HTMLButtonElement>("#site-language");
+  const languageMenu = document.querySelector<HTMLElement>("#language-menu");
+  const languageOptions = document.querySelector<HTMLElement>("#language-options");
   const themeButton = document.querySelector<HTMLButtonElement>("#site-theme");
   const media = matchMedia("(prefers-color-scheme: dark)");
-  const themeOrder = ["system", "light", "dark"] as const;
   const labels = {
     en: { dark: "Dark theme", language: "Language", light: "Light theme", system: "System theme" },
     ko: { dark: "다크 테마", language: "언어", light: "라이트 테마", system: "시스템 테마" },
@@ -104,9 +107,15 @@ const menus = [
   const renderLanguage = () => {
     const language = getLanguage();
     document.documentElement.lang = language;
-    if (languageSelect) {
-      languageSelect.value = language;
-      languageSelect.ariaLabel = labels[language].language;
+    if (languageButton) {
+      languageButton.ariaLabel = labels[language].language;
+      languageButton.title = labels[language].language;
+    }
+    for (const option of document.querySelectorAll<HTMLButtonElement>("[data-locale]")) {
+      const selected = option.dataset.locale === language;
+      option.disabled = selected;
+      option.classList.toggle("font-bold", selected);
+      option.classList.toggle("text-primary", selected);
     }
     for (const element of document.querySelectorAll<HTMLElement>("[data-i18n]")) {
       element.textContent = element.dataset[language] ?? element.textContent;
@@ -134,15 +143,37 @@ const menus = [
       }
     }
   };
-  languageSelect?.addEventListener("change", () => {
-    setLanguage(languageSelect.value === "en" ? "en" : "ko");
+  languageButton?.addEventListener("click", () => {
+    const willOpen = languageOptions?.classList.contains("hidden") ?? false;
+    languageOptions?.classList.toggle("hidden", !willOpen);
+    languageButton.ariaExpanded = String(willOpen);
+  });
+  languageOptions?.addEventListener("click", (event) => {
+    const option = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-locale]");
+    if (!option) {
+      return;
+    }
+    setLanguage(option.dataset.locale === "en" ? "en" : "ko");
+    languageOptions.classList.add("hidden");
+    if (languageButton) {
+      languageButton.ariaExpanded = "false";
+    }
     renderLanguage();
     renderTheme();
   });
   themeButton?.addEventListener("click", () => {
-    const current = getTheme();
-    applyTheme(themeOrder[(themeOrder.indexOf(current) + 1) % themeOrder.length] ?? "system");
+    const current = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+    applyTheme(current === "dark" ? "light" : "dark");
     renderTheme();
+  });
+  document.addEventListener("click", (event) => {
+    if (languageMenu?.contains(event.target as Node)) {
+      return;
+    }
+    languageOptions?.classList.add("hidden");
+    if (languageButton) {
+      languageButton.ariaExpanded = "false";
+    }
   });
   media.addEventListener("change", () => {
     if (getTheme() === "system") {

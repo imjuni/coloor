@@ -4,6 +4,7 @@ import { translate } from "../../i18n/messages";
 import type { Language } from "../../utils/preferences";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Copy } from "lucide-react";
 
 interface NumberFieldProps {
   label: string;
@@ -156,13 +157,14 @@ export const CodeField = ({
           }}
         />
         <Button
-          size="sm"
+          size="icon-sm"
           variant="outline"
           type="button"
           aria-label={`${label} ${translate(language, "copy")}`}
+          title={`${label} ${translate(language, "copy")}`}
           onClick={() => onCopy(code)}
         >
-          {translate(language, "copy")}
+          <Copy aria-hidden="true" />
         </Button>
       </div>
       {error && (
