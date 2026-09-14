@@ -3,7 +3,13 @@ import App from "../color-app";
 import Page from "../layouts/page.astro";
 ---
 
-<Page title="색상 선택기" description="색상을 선택하고 밝고 어두운 색상 변형을 확인합니다." active="picker">
+<Page
+  title="색상 선택기"
+  titleEn="Color picker"
+  description="색상을 선택하고 밝고 어두운 색상 변형을 확인합니다."
+  descriptionEn="Pick a color and explore its lighter and darker variations."
+  active="picker"
+>
   <App client:load />
   <noscript>색상 선택기를 사용하려면 JavaScript를 활성화해 주세요.</noscript>
 </Page>

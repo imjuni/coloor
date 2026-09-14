@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { getLanguage, PREFERENCE_EVENT } from "../utils/preferences";
+import { useIntl } from "react-intl";
 import type { Language } from "../utils/preferences";
 
 const messages = {
@@ -121,11 +120,6 @@ export type MessageKey = keyof typeof messages.ko;
 export const translate = (language: Language, key: MessageKey): string => messages[language][key];
 
 export const useLanguage = (): Language => {
-  const [language, setLanguage] = useState<Language>(getLanguage);
-  useEffect(() => {
-    const update = () => setLanguage(getLanguage());
-    window.addEventListener(PREFERENCE_EVENT, update);
-    return () => window.removeEventListener(PREFERENCE_EVENT, update);
-  }, []);
-  return language;
+  const { locale } = useIntl();
+  return locale === "en" ? "en" : "ko";
 };

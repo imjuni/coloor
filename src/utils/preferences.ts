@@ -36,7 +36,9 @@ export const resolvedTheme = (theme = getTheme()): Exclude<Theme, "system"> => {
 
 export const applyTheme = (theme: Theme): void => {
   localStorage.setItem(THEME_KEY, theme);
-  document.documentElement.dataset.theme = resolvedTheme(theme);
+  const resolved = resolvedTheme(theme);
+  document.documentElement.dataset.theme = resolved;
   document.documentElement.dataset.themePreference = theme;
+  document.documentElement.classList.toggle("dark", resolved === "dark");
   window.dispatchEvent(new CustomEvent(PREFERENCE_EVENT, { detail: { theme } }));
 };

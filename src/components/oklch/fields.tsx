@@ -2,6 +2,8 @@ import { useState } from "react";
 import { calculateChannel, round } from "../../utils/oklch";
 import { translate } from "../../i18n/messages";
 import type { Language } from "../../utils/preferences";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface NumberFieldProps {
   label: string;
@@ -42,7 +44,7 @@ export const NumberField = ({
     <label className="ok-number">
       <span className="sr-only">{label}</span>
       <kbd>{shortcut.toUpperCase()}</kbd>
-      <input
+      <Input
         type="text"
         inputMode="decimal"
         role="spinbutton"
@@ -130,7 +132,7 @@ export const CodeField = ({
     <div className="ok-code">
       <label htmlFor={`color-code-${shortcut}`}>{label}</label>
       <div className="ok-code-row">
-        <input
+        <Input
           id={`color-code-${shortcut}`}
           data-color-key={shortcut}
           spellCheck={false}
@@ -153,13 +155,15 @@ export const CodeField = ({
             }
           }}
         />
-        <button
+        <Button
+          size="sm"
+          variant="outline"
           type="button"
           aria-label={`${label} ${translate(language, "copy")}`}
           onClick={() => onCopy(code)}
         >
           {translate(language, "copy")}
-        </button>
+        </Button>
       </div>
       {error && (
         <p className="ok-error" id={`color-error-${shortcut}`} role="alert">

@@ -168,6 +168,7 @@
   height: 164px;
 }
 .ok-picker .ok-sample {
+  flex: 1 1 50%;
   width: 50%;
   display: flex;
   align-items: end;
@@ -175,6 +176,10 @@
   padding: 12px 4px;
   border: 0;
   border-radius: 0;
+}
+.ok-picker button.ok-sample {
+  align-self: stretch;
+  height: 100%;
 }
 .ok-picker button.ok-sample:hover {
   filter: brightness(1.03);
