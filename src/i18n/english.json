@@ -6,5 +6,8 @@
   "picker.selectColor": "Select {color}",
   "picker.copyHex": "Copy HEX",
   "picker.copyRgba": "Copy RGBA",
-  "picker.apply": "Apply"
+  "picker.copied": "Copied to the clipboard.",
+  "picker.copyFailed": "Could not copy. Check the clipboard permission.",
+  "picker.apply": "Apply",
+  "picker.copyLink": "Copy link"
 }

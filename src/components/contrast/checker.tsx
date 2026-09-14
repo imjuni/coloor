@@ -20,7 +20,7 @@ const copy = {
     graphic: "UI & graphics",
     invalid: "Enter a 3 or 6 digit HEX color.",
     large: "Large text",
-    largeHint: "24px+, or 18.66px+ bold",
+    largeHint: "24px+, or\n18.66px+ bold",
     normal: "Normal text",
     normalHint: "Text smaller than large text",
     preview: "Live preview",
@@ -42,7 +42,7 @@ const copy = {
     graphic: "UI 및 그래픽",
     invalid: "3자리 또는 6자리 HEX 색상을 입력하세요.",
     large: "큰 텍스트",
-    largeHint: "24px 이상 또는 굵은 18.66px 이상",
+    largeHint: "24px 이상 또는\n굵은 18.66px 이상",
     normal: "일반 텍스트",
     normalHint: "큰 텍스트보다 작은 글자",
     preview: "실시간 미리보기",
@@ -56,14 +56,17 @@ const copy = {
 
 type ColorFieldProps = {
   error: boolean;
+  id: string;
   label: string;
   onChange: (value: string) => void;
   value: string;
 };
 
-const ColorField = ({ error, label, onChange, value }: ColorFieldProps) => (
-  <label className="grid gap-2 text-sm font-medium text-muted-foreground">
-    <span>{label}</span>
+const ColorField = ({ error, id, label, onChange, value }: ColorFieldProps) => (
+  <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-4">
+    <label className="text-sm font-medium text-muted-foreground" htmlFor={id}>
+      {label}
+    </label>
     <div
       className={`flex h-12 items-center gap-2 rounded-md border bg-background px-2 shadow-xs focus-within:ring-2 focus-within:ring-ring ${error ? "border-destructive" : ""}`}
     >
@@ -78,6 +81,7 @@ const ColorField = ({ error, label, onChange, value }: ColorFieldProps) => (
         #
       </span>
       <Input
+        id={id}
         className="h-auto border-0 bg-transparent px-0 font-mono font-semibold uppercase shadow-none focus-visible:ring-0"
         type="text"
         value={value.replace(/^#/u, "")}
@@ -88,7 +92,7 @@ const ColorField = ({ error, label, onChange, value }: ColorFieldProps) => (
         aria-invalid={error}
       />
     </div>
-  </label>
+  </div>
 );
 
 const Result = ({
@@ -105,9 +109,9 @@ const Result = ({
   <Card className="min-h-28 flex-row items-center justify-between gap-5 p-5 xl:p-6">
     <div className="min-w-0">
       <h3 className="text-lg font-semibold leading-tight">{label}</h3>
-      <p className="mt-1 text-sm leading-snug text-muted-foreground">{hint}</p>
+      <p className="mt-1 whitespace-pre-line text-sm leading-snug text-muted-foreground">{hint}</p>
     </div>
-    <div className="flex flex-wrap justify-end gap-2">
+    <div className="grid shrink-0 justify-items-center gap-2">
       {thresholds.map((threshold, index) => {
         const pass = ratio >= threshold;
         return (
@@ -186,47 +190,56 @@ const ContrastCheckerContent = () => {
       </header>
 
       <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[minmax(0,1.7fr)_minmax(260px,.7fr)]">
-        <Card className="relative grid gap-5 p-5 md:grid-cols-2 md:gap-x-11" aria-label={t.title}>
-          <ColorField
-            label={t.foreground}
-            value={foreground}
-            onChange={setForeground}
-            error={foregroundError}
-          />
-          <div className="grid gap-2">
-            <div className="flex justify-between text-sm font-medium text-muted-foreground">
-              <label htmlFor="contrast-opacity">{t.alpha}</label>
-              <output className="text-xs font-bold">{opacity}%</output>
+        <Card className="grid gap-6 p-5 md:grid-cols-2 md:gap-x-10" aria-label={t.title}>
+          <div className="grid gap-4">
+            <ColorField
+              id="contrast-foreground"
+              label={t.foreground}
+              value={foreground}
+              onChange={setForeground}
+              error={foregroundError}
+            />
+            <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-4">
+              <span aria-hidden="true" />
+              <Button
+                type="button"
+                className="mx-auto size-9 rotate-90 rounded-full"
+                size="icon"
+                variant="outline"
+                onClick={() => {
+                  setForeground(background);
+                  setBackground(foreground);
+                }}
+                aria-label={t.swap}
+              >
+                ⇅ <span className="sr-only">{t.swap}</span>
+              </Button>
             </div>
-            <input
-              className="w-full accent-primary"
-              id="contrast-opacity"
-              type="range"
-              min="0"
-              max="100"
-              value={opacity}
-              onChange={(event) => setOpacity(Number(event.target.value))}
+            <ColorField
+              id="contrast-background"
+              label={t.background}
+              value={background}
+              onChange={setBackground}
+              error={backgroundError}
             />
           </div>
-          <Button
-            type="button"
-            className="absolute left-1/2 top-10 size-9 -translate-x-1/2 rotate-90 rounded-full max-md:hidden"
-            size="icon"
-            variant="outline"
-            onClick={() => {
-              setForeground(background);
-              setBackground(foreground);
-            }}
-            aria-label={t.swap}
-          >
-            ⇅ <span className="sr-only">{t.swap}</span>
-          </Button>
-          <ColorField
-            label={t.background}
-            value={background}
-            onChange={setBackground}
-            error={backgroundError}
-          />
+          <div className="flex items-center justify-center">
+            <div className="grid w-4/5 max-w-lg gap-3">
+              <div className="flex justify-between text-sm font-medium text-muted-foreground">
+                <label htmlFor="contrast-opacity">{t.alpha}</label>
+                <output className="text-xs font-bold">{opacity}%</output>
+              </div>
+              <input
+                className="w-full accent-primary"
+                id="contrast-opacity"
+                type="range"
+                min="0"
+                max="100"
+                value={opacity}
+                onChange={(event) => setOpacity(Number(event.target.value))}
+              />
+            </div>
+          </div>
           {(foregroundError || backgroundError) && (
             <p className="col-span-full -mt-2 text-xs text-destructive" role="alert">
               {t.invalid}
